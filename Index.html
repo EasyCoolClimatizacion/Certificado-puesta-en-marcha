@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificado de Instalación v5.0 (Múltiple) - EasyCool</title>
+    <!-- 
+      Versión 5.0 (Corregida):
+      - Mueve todos los parámetros (incluyendo fotos y drenaje) a cada equipo.
+      - Mueve todas las fotos a un "Anexo Fotográfico" al final.
+      - Aumenta el tamaño de fuente en la impresión.
+      - Saltos de página forzados antes de Fotos y Checklist.
+      - CORRECCIÓN: Se permite que los bloques de equipo se corten entre páginas (para evitar hojas en blanco).
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .calculator-section { background: #ffffff; }
+        [contenteditable="true"]:hover { outline: 2px dashed #a5b4fc; }
+        [contenteditable="true"]:focus { 
+            outline: 2px solid #3b82f6; 
+            background-color: #eff6ff; 
+            box-shadow: 0 0 0 2px #bfdbfe;
+        }
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .file-input-container {
+            border-left: 3px solid #dbeafe; /* blue-100 */
+            padding-left: 0.75rem; /* pl-3 */
+            margin-left: 1.75rem; /* ml-7 */
+            margin-top: 0.5rem; /* mt-2 */
+        }
+        .custom-file-input {
+            font-size: 0.75rem; /* text-xs */
+            color: #4b5563; /* text-gray-600 */
+        }
+        .custom-file-input::file-selector-button {
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600; /* font-semibold */
+            color: #1d4ed8; /* text-blue-700 */
+            background-color: #eff6ff; /* bg-blue-50 */
+            border: 1px solid #dbeafe; /* border-blue-100 */
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.25rem 0.5rem; /* py-1 px-2 */
+            margin-right: 0.5rem; /* mr-2 */
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .custom-file-input::file-selector-button:hover {
+            background-color: #dbeafe; /* bg-blue-100 */
+        }
+        .equipo-item-form {
+            transition: all 0.3s ease-in-out;
+        }
+        .remove-equipo-btn {
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+        .remove-equipo-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        @media print {
+            body { 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+                background-color: #ffffff;
+            }
+            .no-print { display: none; }
+            .printable-section {
+                max-width: none !important; 
+                box-shadow: none !important;
+                border: none !important; 
+                padding: 0 !important; 
+                margin: 0 !important;
+                /* CORRECCIÓN: Aumentar tamaño de letra base en impresión */
+                font-size: 1rem; /* 16px */
+            }
+            /* CORRECCIÓN: Ajustar tamaños relativos para la impresión */
+            .printable-section .text-sm {
+                font-size: 0.95rem; /* 15px */
+            }
+            .printable-section .text-xs {
+                font-size: 0.8rem; /* 13px */
+            }
+            
+            /* --- INICIO CORRECCIÓN DE IMPRESIÓN --- */
+            
+            /* CORRECCIÓN: Se quita la regla 'page-break-inside: avoid' para permitir que los bloques se corten */
+            /* .equipo-item-print {
+                page-break-inside: avoid; 
+            } */
+
+            .print-photo-container {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            /* Salto de página forzado ANTES de las fotos */
+            #certificate-photos-section {
+                page-break-before: always; 
+            }
+            .photo-block-print {
+                page-break-inside: avoid;
+            }
+            /* Salto de página forzado ANTES del checklist/notas */
+            #certificate-verification-section {
+                page-break-before: always;
+            }
+            .photo-item {
+                page-break-inside: avoid;
+            }
+            /* --- FIN CORRECCIÓN DE IMPRESIÓN --- */
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <!-- BOTÓN VOLVER AL MENÚ -->
+    <div class="max-w-4xl mx-auto mb-4 no-print">
+        <a href="index.html" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+            </svg>
+            Volver al Menú
+        </a>
+    </div>
+
+    <!-- SECCIÓN DE FORMULARIO (NO SE IMPRIME) -->
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-2xl mb-8 no-print calculator-section">
+        
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Certificado de Puesta en Marcha v5.0</h2>
+        
+        <!-- Datos Cliente y Técnico -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 border-b pb-6 mb-6">
+            <!-- CORRECCIÓN: Se quita 'readonly' para permitir edición manual -->
+            <input type="text" id="cert-client-name" placeholder="Nombre del Cliente" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <input type="text" id="cert-client-rut" placeholder="RUT del Cliente" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <input type="text" id="cert-client-address" placeholder="Dirección del Cliente" class="md:col-span-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            
+            <!-- Folio Correlativo -->
+            <input type="text" id="cert-number" placeholder="N° Certificado" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100" readonly>
+            
+            <input type="date" id="cert-install-date" class="block w-full rounded-md border-gray-300 shadow-sm text-gray-500 focus:border-indigo-500 focus:ring-indigo-500" title="Fecha de Instalación">
+            <input type="text" id="cert-technician" value="Jose Guerrero" class="md:col-span-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            
+            <div class="md:col-span-2">
+                <label for="cert-supply" class="block text-sm font-medium text-gray-700">Suministro de Equipo</slabel>
+                <select id="cert-supply" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="Suministrado por EasyCool Climatización">Suministrado por EasyCool Climatización</option>
+                    <option value="Suministrado por el Cliente">Suministrado por el Cliente</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- (NUEVO) Datos Equipos (Dinámico) -->
+        <div class="border-b pb-4 mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Equipos Instalados</h3>
+            <div id="equipos-container" class="space-y-4">
+                <!-- Los equipos se añadirán aquí por JS -->
+            </div>
+            <button id="add-equipo-btn" class="mt-4 w-full bg-blue-100 text-blue-800 font-semibold py-2 px-4 rounded-lg border-2 border-dashed border-blue-300 hover:bg-blue-200 transition-colors">
+                + Añadir otro equipo
+            </button>
+        </div>
+
+
+        <!-- SECCIÓN GLOBAL (SOLO NOTAS E INSTRUCCIÓN) -->
+        <div>
+            <h3 class="text-lg font-semibold text-gray-800">Checklist y Notas Globales</h3>
+            <div class="space-y-4 mt-4">
+                <div class="flex items-center">
+                    <input id="cert-check-briefing" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="cert-check-briefing" class="ml-3 block text-sm text-gray-900">Instrucción al cliente (Uso, Filtros, Mantención) OK</label>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <label class="block text-sm font-medium text-gray-700">Notas Adicionales (Globales)</label>
+                <textarea id="cert-notes" rows="4" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Detalles de la instalación, ubicación de equipos, etc..."></textarea>
+            </div>
+        </div>
+
+        <!-- Botón Generar -->
+        <div class="mt-8">
+            <button id="generate-certificate-btn" class="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center justify-center" disabled>
+                <span class="btn-text">Generar Certificado</span>
+                <span class="spinner" style="display: none;"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE PLANTILLA IMPRIMIBLE -->
+    <div id="printable-area" class="max-w-4xl mx-auto">
+        <div id="certificate-section" class="printable-section bg-white p-6 sm:p-10 rounded-lg" style="display:none;">
+            
+            <!-- ENCABEZADO PROFESIONAL -->
+            <header class="flex justify-between items-start pb-6 border-b-2 border-gray-200">
+                <div class="w-2/5">
+                     <svg viewBox="0 0 250 50" class="h-12 w-auto" aria-label="Logo de EasyCool">
+                         <g transform="translate(0, -2.5) scale(0.9)"><rect y="5" width="50" height="10" rx="5" fill="#3B82F6" opacity="0.8"></rect><rect x="5" y="20" width="45" height="10" rx="5" fill="#60A5FA" opacity="0.9"></rect><rect x="10" y="35" width="40" height="10" rx="5" fill="#93C5FD"></rect></g><text x="60" y="22" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#1f2937">EASYCOOL</text><text x="60" y="40" font-family="Inter, sans-serif" font-size="14" font-weight="400" fill="#6b7280">Climatización</text>
+                     </svg>
+                </div>
+                <div class="w-3/5 text-right text-sm text-gray-600 space-y-1">
+                    <p class="font-semibold text-gray-800">EasyCool Climatización</p>
+                    <p>RUT: 77.448.234-2</p>
+                    <p>ventas@easycoolclimatizacion.com</p>
+                    <p>+569 5777 6174 / +569 4489 4101</p>
+                    <p>Providencia, Santiago</p>
+                </div>
+            </header>
+            
+            <main class="mt-8"> <!-- La clase 'text-base' se aplicará por CSS -->
+                <!-- TÍTULO Y NÚMERO -->
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl font-bold text-gray-900">CERTIFICADO DE PUESTA EN MARCHA</h1>
+                    <p class="text-gray-700 mt-1"> <!-- 'text-sm' se ajustará por CSS -->
+                        <strong>N° Certificado:</strong> <span id="print-cert-number" contenteditable="true" class="font-medium"></span>
+                    </p>
+                </div>
+
+                <!-- SECCIONES EN CAJAS -->
+                <section class="mb-6">
+                    <h2 class="text-lg font-semibold text-blue-700 border-b-2 border-blue-100 pb-2 mb-4">Datos del Cliente</h2>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-2"> <!-- 'text-sm' se ajustará por CSS -->
+                        <div><strong>Cliente:</strong> <span id="print-cert-client-name" contenteditable="true"></span></div>
+                        <div><strong>RUT:</strong> <span id="print-cert-client-rut" contenteditable="true"></span></div>
+                        <div class="col-span-2"><strong>Dirección:</strong> <span id="print-cert-client-address" contenteditable="true"></span></div>
+                        <div><strong>Fecha Instalación:</strong> <span id="print-cert-install-date" contenteditable="true"></span></div>
+                        <div><strong>Técnico:</strong> <span id="print-cert-technician" contenteditable="true"></span></div>
+                        <div class="col-span-2"><strong>Suministro de Equipo:</strong> <span id="print-cert-supply" class="font-medium" contenteditable="true"></span></div>
+                    </div>
+                </section>
+                
+                <!-- (NUEVO) Sección de Equipos (Dinámica) -->
+                <section class="mb-6" id="certificate-equipos-section">
+                    <h2 class="text-lg font-semibold text-blue-700 border-b-2 border-blue-100 pb-2 mb-4">Datos y Parámetros de Equipos Instalados</h2>
+                    <!-- Contenedor para los equipos impresos -->
+                    <div id="print-equipos-container" class="space-y-6">
+                        <!-- Los equipos y sus parámetros se insertarán aquí -->
+                    </div>
+                </section>
+                
+                <!-- NUEVO: SECCIÓN DE FOTOS ANEXAS -->
+                <section class="mb-8" id="certificate-photos-section">
+                    <h2 class="text-lg font-semibold text-blue-700 border-b-2 border-blue-100 pb-2 mb-4">Registro Fotográfico Adjunto</h2>
+                    <div id="print-photos-container" class="space-y-6">
+                        <!-- Los bloques de fotos por equipo se insertarán aquí -->
+                    </div>
+                </section>
+                
+                <section class="mb-8" id="certificate-verification-section">
+                    <!-- CORRECCIÓN: Ahora es solo el checklist global -->
+                    <h2 class="text-lg font-semibold text-blue-700 border-b-2 border-blue-100 pb-2 mb-4">Checklist Global</h2>
+                    <!-- CORRECCIÓN: Se quita la grilla y se deja como lista simple -->
+                    <div id="print-cert-checklist" class="space-y-2"> <!-- 'text-sm' se ajustará por CSS -->
+                        <!-- Items de checklist global se insertarán aquí -->
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="font-semibold text-gray-800">Notas Adicionales:</h3> <!-- 'text-sm' se ajustará por CSS -->
+                        <p id="print-cert-notes" class="text-gray-700 whitespace-pre-wrap border border-gray-200 p-3 rounded-md bg-gray-50 mt-2" contenteditable="true"></p> <!-- 'text-sm' se ajustará por CSS -->
+                    </div>
+                </section>
+                
+                <!-- Firmas -->
+                <section class="mt-24 pt-8 flex justify-around text-center">
+                    <div class="w-2/5">
+                        <div class="border-t-2 border-gray-400 pt-2">
+                            <p class="font-semibold" contenteditable="true" id="print-cert-footer-tecnico">Jose Guerrero</p> <!-- 'text-sm' se ajustará por CSS -->
+                            <p class="text-gray-600">Técnico EasyCool Climatización</p> <!-- 'text-xs' se ajustará por CSS -->
+                        </div>
+                    </div>
+                    <div class="w-2/5">
+                        <div class="border-t-2 border-gray-400 pt-2">
+                            <p class="font-semibold">Firma del Cliente</p> <!-- 'text-sm' se ajustará por CSS -->
+                            <p class="text-gray-600">Recibí Conforme</p> <!-- 'text-xs' se ajustará por CSS -->
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    
+    <div class="max-w-4xl mx-auto text-center mt-4 no-print">
+        <button id="print-button" onclick="window.print()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors" style="display:none;">
+            Imprimir / Guardar como PDF
+        </button>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- LÓGICA PARA CERTIFICADO ---
+
+    // Selectores DOM Certificado
+    const generateCertificateBtn = document.getElementById('generate-certificate-btn');
+    const printButton = document.getElementById('print-button');
+    const btnText = generateCertificateBtn.querySelector('.btn-text');
+    const btnSpinner = generateCertificateBtn.querySelector('.spinner');
+    const addEquipoBtn = document.getElementById('add-equipo-btn');
+    const equiposContainer = document.getElementById('equipos-container');
+    const certNotesTextarea = document.getElementById('cert-notes');
+    const certNumberInput = document.getElementById('cert-number');
+
+    // Habilitar el botón de generar solo cuando se ha rellenado el nombre del cliente
+    const clientNameInput = document.getElementById('cert-client-name');
+    clientNameInput.addEventListener('input', () => {
+        if (clientNameInput.value.trim() !== '') {
+            generateCertificateBtn.disabled = false;
+        } else {
+            generateCertificateBtn.disabled = true;
+        }
+    });
+
+    // --- LÓGICA DE AÑADIR/QUITAR EQUIPOS ---
+    let equipoCount = 0;
+    function createEquipoRow() {
+        equipoCount++;
+        const uniqueId = Date.now() + '-' + equipoCount; // ID único para los labels/inputs de fotos
+        const div = document.createElement('div');
+        div.className = 'equipo-item-form grid grid-cols-1 md:grid-cols-12 gap-3 bg-gray-50 p-3 rounded-lg border';
+        
+        // Plantilla de Equipo
+        div.innerHTML = `
+            <div class="md:col-span-12 flex justify-between items-center">
+                <h4 class="font-semibold text-gray-800">Equipo #${equipoCount}</h4>
+                <button class="remove-equipo-btn p-1 text-red-600 hover:text-red-800" title="Eliminar equipo">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Fila 1: Datos UI -->
+            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Datos Unidad Interior</h5>
+            <div class="md:col-span-4">
+                <input type="text" class="cert-ui-brand block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Marca UI">
+            </div>
+            <div class="md:col-span-4">
+                <input type="text" class="cert-ui-model block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Modelo UI">
+            </div>
+            <div class="md:col-span-4">
+                <input type="text" class="cert-ui-serial block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="N° Serie UI">
+            </div>
+
+            <!-- Fila 2: Datos UE -->
+            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Datos Unidad Exterior</h5>
+            <div class="md:col-span-4">
+                <input type="text" class="cert-ue-brand block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Marca UE">
+            </div>
+            <div class="md:col-span-4">
+                <input type="text" class="cert-ue-model block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Modelo UE">
+            </div>
+            <div class="md:col-span-4">
+                <input type="text" class="cert-ue-serial block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="N° Serie UE">
+            </div>
+
+            <!-- Fila 3: Mediciones Operativas -->
+            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Parámetros Operativos (Modo Frío) - Equipo #${equipoCount}</h5>
+            <div class="md:col-span-3">
+                <input type="number" class="cert-pressure-low block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Presión Baja (PSI)">
+            </div>
+            <div class="md:col-span-3">
+                <input type="number" class="cert-pressure-high block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Presión Alta (PSI)">
+            </div>
+            <div class="md:col-span-2">
+                <input type="number" class="cert-amps block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Consumo (A)">
+            </div>
+            <div class="md:col-span-2">
+                <input type="number" class="cert-voltage block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Voltaje (V)">
+            </div>
+            <div class="md:col-span-2 grid grid-cols-2 gap-2">
+                <input type="number" class="cert-temp-in block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="T. Iny (°C)">
+                <input type="number" class="cert-temp-out block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="T. Ret (°C)">
+            </div>
+
+            <!-- Fila 4: Parámetros de Instalación (Movido aquí) -->
+            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Parámetros de Instalación - Equipo #${equipoCount}</h5>
+            <div class="md:col-span-4">
+                 <input type="number" class="cert-vacuum block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Vacío (Micrones)">
+            </div>
+            <div class="md:col-span-4">
+                 <input type="number" class="cert-vacuum-time block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Tiempo Vacío (Mins)">
+            </div>
+            <div class="md:col-span-4">
+                 <input type="text" class="cert-refrigerant block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Refrigerante (ej: R410A)">
+            </div>
+            
+            <!-- Fila 5: Checklist y Fotos (Movido aquí) -->
+            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Checklist y Fotos - Equipo #${equipoCount}</h5>
+            
+            <div class="md:col-span-12">
+                 <div class="flex items-center">
+                    <input id="cert-check-drain-${uniqueId}" type="checkbox" class="cert-check-drain h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="cert-check-drain-${uniqueId}" class="ml-3 block text-sm font-medium text-gray-900">Prueba de Drenaje (Bandeja y Manguera) OK</Slabel>
+                 </div>
+            </div>
+
+            <div class="md:col-span-6">
+                 <div class="flex items-center">
+                    <input id="cert-check-photo-vacuum-${uniqueId}" type="checkbox" class="cert-check-photo-vacuum h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="cert-check-photo-vacuum-${uniqueId}" class="ml-3 block text-sm font-medium text-gray-900">Foto Vacuómetro</label>
+                 </div>
+                 <div class="file-input-container">
+                    <input type="file" id="cert-photo-file-vacuum-${uniqueId}" class="cert-photo-file-vacuum custom-file-input" accept="image/*">
+                 </div>
+            </div>
+            
+            <div class="md:col-span-6">
+                 <div class="flex items-center">
+                    <input id="cert-check-photo-pressure-${uniqueId}" type="checkbox" class="cert-check-photo-pressure h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="cert-check-photo-pressure-${uniqueId}" class="ml-3 block text-sm font-medium text-gray-900">Foto Manómetros</label>
+                 </div>
+                 <div class="file-input-container">
+                    <input type="file" id="cert-photo-file-pressure-${uniqueId}" class="cert-photo-file-pressure custom-file-input" accept="image/*">
+                 </div>
+            </div>
+        `;
+        
+        equiposContainer.appendChild(div);
+
+        // Ocultar botón de eliminar si es el único equipo
+        updateRemoveButtons();
+    }
+
+    function updateRemoveButtons() {
+        const removeButtons = equiposContainer.querySelectorAll('.remove-equipo-btn');
+        const hidden = removeButtons.length <= 1;
+        removeButtons.forEach(btn => btn.style.display = hidden ? 'none' : 'block');
+    }
+
+    addEquipoBtn.addEventListener('click', createEquipoRow);
+
+    equiposContainer.addEventListener('click', (e) => {
+        const removeBtn = e.target.closest('.remove-equipo-btn');
+        if (removeBtn) {
+            const row = removeBtn.closest('.equipo-item-form');
+            row.style.opacity = '0';
+            row.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                row.remove();
+                updateRemoveButtons();
+                // Re-numerar equipos
+                equipoCount = 0;
+                equiposContainer.querySelectorAll('h4').forEach((h4, index) => {
+                    equipoCount = index + 1;
+                    h4.textContent = `Equipo #${equipoCount}`;
+                    // Actualizar también los subtítulos
+                    row.querySelectorAll('h5').forEach(h5 => {
+                        if(h5.textContent.includes('Equipo #')) {
+                            h5.textContent = h5.textContent.replace(/Equipo #\d+/, `Equipo #${equipoCount}`);
+                        }
+                    });
+                });
+            }, 300);
+        }
+    });
+
+
+    // --- Función para leer archivo como Data URL (para incrustar imagen) ---
+    const readFileAsDataURL = (file) => {
+        return new Promise((resolve, reject) => {
+            if (!file) {
+                resolve(null); // Resuelve null si no hay archivo
+            }
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // --- Función para crear el ícono de Check (✓) o Cruz (✗) ---
+    function createCheckIcon(isChecked) {
+        const icon = isChecked ? '✓' : '✗';
+        const color = isChecked ? 'text-green-600' : 'text-red-500';
+        return `<span class="font-bold ${color} mr-2 text-lg">${icon}</span>`;
+    }
+
+    // --- Generar Certificado ---
+    generateCertificateBtn.addEventListener('click', async () => {
+        // Mostrar estado de carga
+        btnText.style.display = 'none';
+        btnSpinner.style.display = 'block';
+        generateCertificateBtn.disabled = true;
+
+        try {
+            // 1. Mostrar la plantilla imprimible y el botón de imprimir
+            document.getElementById('certificate-section').style.display = 'block';
+            printButton.style.display = 'inline-block';
+
+            // 2. Poblar los datos de texto (Cliente e Informe)
+            const clienteNombre = document.getElementById('cert-client-name').value;
+            document.getElementById('print-cert-client-name').textContent = clienteNombre;
+            document.getElementById('print-cert-client-rut').textContent = document.getElementById('cert-client-rut').value;
+            document.getElementById('print-cert-client-address').textContent = document.getElementById('cert-client-address').value;
+            
+            const rawDate = document.getElementById('cert-install-date').value;
+            if (rawDate) {
+                const installDate = new Date(rawDate + 'T00:00:00'); // Corregir zona horaria
+                document.getElementById('print-cert-install-date').textContent = installDate.toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' });
+            } else {
+                 document.getElementById('print-cert-install-date').textContent = "No especificada";
+            }
+            
+            const tecnicoNombre = document.getElementById('cert-technician').value;
+            document.getElementById('print-cert-technician').textContent = tecnicoNombre;
+            document.getElementById('print-cert-footer-tecnico').textContent = tecnicoNombre;
+            
+            document.getElementById('print-cert-supply').textContent = document.getElementById('cert-supply').value;
+            
+            const folio = certNumberInput.value;
+            document.getElementById('print-cert-number').textContent = folio;
+
+            // 3. Poblar Equipos Múltiples
+            const printEquiposContainer = document.getElementById('print-equipos-container');
+            printEquiposContainer.innerHTML = '';
+            const equipoItems = equiposContainer.querySelectorAll('.equipo-item-form');
+            
+            // NUEVO: Array para guardar los bloques de fotos
+            let allPhotosHtmlBlocks = [];
+
+            // Usamos un bucle 'for...of' para poder usar 'await' dentro
+            let equipoIndex = 0;
+            for (const item of equipoItems) {
+                equipoIndex++;
+                
+                // Datos de Texto
+                const ui_brand = item.querySelector('.cert-ui-brand').value || 'N/A';
+                const ui_model = item.querySelector('.cert-ui-model').value || 'N/A';
+                const ui_serial = item.querySelector('.cert-ui-serial').value || 'N/A';
+                const ue_brand = item.querySelector('.cert-ue-brand').value || 'N/A';
+                const ue_model = item.querySelector('.cert-ue-model').value || 'N/A';
+                const ue_serial = item.querySelector('.cert-ue-serial').value || 'N/A';
+                
+                const pBaja = item.querySelector('.cert-pressure-low').value || 'N/A';
+                const pAlta = item.querySelector('.cert-pressure-high').value || 'N/A';
+                const consumo = item.querySelector('.cert-amps').value || 'N/A';
+                const voltaje = item.querySelector('.cert-voltage').value || 'N/A';
+                const tempIn = parseFloat(item.querySelector('.cert-temp-in').value);
+                const tempOut = parseFloat(item.querySelector('.cert-temp-out').value);
+
+                const vacuum = item.querySelector('.cert-vacuum').value || 'N/A';
+                const vacuumTime = item.querySelector('.cert-vacuum-time').value || 'N/A';
+                const refrigerant = item.querySelector('.cert-refrigerant').value || 'N/A';
+
+                // Cálculo de Salto Térmico (ΔT)
+                let saltoTermico = 'N/A';
+                if (!isNaN(tempIn) && !isNaN(tempOut) && tempOut > tempIn) { // Modo Frío
+                    saltoTermico = (tempOut - tempIn).toFixed(1) + ' °C';
+                } else if (!isNaN(tempIn) && !isNaN(tempOut)) { // Modo Calor o sin diferencia
+                    saltoTermico = (tempIn - tempOut).toFixed(1) + ' °C';
+                }
+
+                // Datos de Checklist por Equipo
+                const checkDrain = item.querySelector('.cert-check-drain').checked;
+                const checkVacuumPhoto = item.querySelector('.cert-check-photo-vacuum').checked;
+                const checkPressurePhoto = item.querySelector('.cert-check-photo-pressure').checked;
+
+                // Datos de Fotos por Equipo (usamos 'await' aquí)
+                const fileVacuum = item.querySelector('.cert-photo-file-vacuum').files[0];
+                const filePressure = item.querySelector('.cert-photo-file-pressure').files[0];
+                
+                const dataUrlVacuum = await readFileAsDataURL(fileVacuum);
+                const dataUrlPressure = await readFileAsDataURL(filePressure);
+
+                // Construir el HTML de las fotos
+                let photosHTML = '';
+                if (dataUrlVacuum) {
+                    photosHTML += `
+                        <div class="photo-item border p-2 rounded-lg shadow-sm">
+                            <img src="${dataUrlVacuum}" alt="Foto Vacuómetro" class="w-full h-auto object-cover rounded-md mb-2">
+                            <p class="text-xs text-center text-gray-700 font-medium">Foto Vacuómetro</p>
+                        </div>`;
+                }
+                if (dataUrlPressure) {
+                    photosHTML += `
+                        <div class="photo-item border p-2 rounded-lg shadow-sm">
+                            <img src="${dataUrlPressure}" alt="Foto Manómetros" class="w-full h-auto object-cover rounded-md mb-2">
+                            <p class="text-xs text-center text-gray-700 font-medium">Foto Manómetros</p>
+                        </div>`;
+                }
+                
+                // NUEVO: Guardar el bloque de fotos en el array, si hay fotos
+                if (photosHTML !== '') {
+                    allPhotosHtmlBlocks.push(`
+                        <div class="photo-block-print">
+                            <h4 class="text-base font-semibold text-gray-900 mb-3">Registro Fotográfico (Equipo #${equipoIndex})</h4>
+                            <div class="print-photo-container grid grid-cols-2 gap-4 mt-2">
+                                ${photosHTML}
+                            </div>
+                        </div>
+                    `);
+                }
+
+
+                // Crear el div principal del equipo
+                const equipoDiv = document.createElement('div');
+                equipoDiv.className = 'equipo-item-print bg-gray-50 p-4 rounded-lg border';
+                
+                // NUEVO: Plantilla de equipo SIN la sección de fotos
+                // CORRECCIÓN: Se quitan clases 'text-sm' para que hereden el 'text-base'
+                equipoDiv.innerHTML = `
+                    <h4 class="text-base font-semibold text-gray-900 mb-3">Equipo #${equipoIndex}</h4>
+                    
+                    <!-- Datos UI/UE -->
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-2">
+                        <div class="font-medium text-gray-800 col-span-2">Unidad Interior</div>
+                        <div><strong>Marca:</strong> ${ui_brand}</div>
+                        <div><strong>Modelo:</strong> ${ui_model}</div>
+                        <div class="col-span-2"><strong>N° Serie:</strong> <span class="font-mono">${ui_serial}</span></div>
+                        
+                        <div class="font-medium text-gray-800 pt-3 mt-3 border-t col-span-2">Unidad Exterior</div>
+                        <div><strong>Marca:</strong> ${ue_brand}</div>
+                        <div><strong>Modelo:</strong> ${ue_model}</div>
+                        <div class="col-span-2"><strong>N° Serie:</strong> <span class="font-mono">${ue_serial}</span></div>
+                    </div>
+
+                    <!-- Parámetros Operativos -->
+                    <h5 class="font-medium text-gray-800 pt-3 mt-3 border-t col-span-2">Parámetros Operativos (Modo Frío)</h5>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 mt-2">
+                        <div><strong>Voltaje:</strong> ${voltaje} V</div>
+                        <div><strong>Consumo:</strong> ${consumo} A</div>
+                        <div><strong>Presión Baja:</strong> ${pBaja} PSI</div>
+                        <div><strong>Presión Alta:</strong> ${pAlta} PSI</div>
+                        <div class="font-bold col-span-2 md:col-span-1">ΔT: <span class="text-blue-700">${saltoTermico}</span></div>
+                    </div>
+                    
+                    <!-- Parámetros de Instalación -->
+                    <h5 class="font-medium text-gray-800 pt-3 mt-3 border-t col-span-2">Parámetros de Instalación (Equipo)</h5>
+                    <div class="grid grid-cols-3 gap-x-6 gap-y-2 mt-2">
+                        <div><strong>Refrigerante:</strong> ${refrigerant}</div>
+                        <div><strong>Vacío:</strong> ${vacuum} Micrones</div>
+                        <div><strong>Tiempo Vacío:</strong> ${vacuumTime} Min.</div>
+                    </div>
+
+                    <!-- Checklist por Equipo -->
+                    <h5 class="font-medium text-gray-800 pt-3 mt-3 border-t col-span-2">Checklist (Equipo)</h5>
+                    <div class="mt-2 space-y-1">
+                        <div class="flex items-center">${createCheckIcon(checkDrain)} Prueba de Drenaje OK</div>
+                        <div classf="flex items-center">${createCheckIcon(checkVacuumPhoto)} Foto Vacuómetro OK</div>
+                        <div class="flex items-center">${createCheckIcon(checkPressurePhoto)} Foto Manómetros OK</div>
+                    </div>
+                `;
+                printEquiposContainer.appendChild(equipoDiv);
+            }
+
+            // 4. NUEVO: Poblar la sección de fotos anexa
+            const printPhotosContainer = document.getElementById('print-photos-container');
+            if (allPhotosHtmlBlocks.length > 0) {
+                printPhotosContainer.innerHTML = allPhotosHtmlBlocks.join('<div class="h-6"></div>'); // Añade un espacio entre bloques de fotos
+            } else {
+                printPhotosContainer.innerHTML = '<p class="text-gray-500">No se adjuntaron registros fotográficos.</p>';
+            }
+
+            // 5. Poblar Checklist Global
+            const checklistContainer = document.getElementById('print-cert-checklist');
+            checklistContainer.innerHTML = ''; // Limpiar
+            
+            const checkBriefing = document.getElementById('cert-check-briefing').checked;
+            checklistContainer.innerHTML += `<div class="flex items-center">${createCheckIcon(checkBriefing)} Instrucción al Cliente OK</div>`;
+            
+            // 6. Poblar Notas Globales
+            document.getElementById('print-cert-notes').textContent = document.getElementById('cert-notes').value;
+
+            // 7. Scroll para ver el resultado
+            document.getElementById('certificate-section').scrollIntoView({ behavior: 'smooth' });
+            
+            // 8. Configurar título para impresión y guardar siguiente folio
+            const newTitle = `Certificado Nº${folio} - ${clienteNombre}`;
+            document.title = newTitle;
+
+            const currentFolioNum = parseInt(folio.split('-').pop());
+            if (!isNaN(currentFolioNum)) {
+                const nextFolio = currentFolioNum + 1;
+                localStorage.setItem('folioCertificado', nextFolio.toString());
+            }
+
+        } catch (error) {
+            console.error("Error al generar el certificado:", error);
+            // Idealmente, mostrar esto en un modal de error, no un alert.
+            // alert("Ocurrió un error al generar el certificado. Revisa la consola para más detalles.");
+        } finally {
+            // Restaurar botón
+            btnText.style.display = 'block';
+            btnSpinner.style.display = 'none';
+            generateCertificateBtn.disabled = false;
+        }
+    });
+    
+    // Restaurar el título original después de imprimir
+    const originalTitle = document.title;
+    window.addEventListener('afterprint', () => {
+        document.title = originalTitle;
+        // Recargar el folio en el input para que muestre el siguiente
+        inicializarFolio(); 
+    });
+
+
+    // --- LÓGICA DE CONEXIÓN AL DASHBOARD (RECEPTOR) ---
+    function poblarDatosDelDashboard() {
+        const params = new URLSearchParams(window.location.search);
+        
+        const nombre = params.get('name');
+        const rut = params.get('rut');
+        const direccion = params.get('address');
+
+        if (nombre) {
+            document.getElementById('cert-client-name').value = decodeURIComponent(nombre);
+            // Habilitar el botón si el nombre viene del dashboard
+            generateCertificateBtn.disabled = false;
+        }
+        if (rut) {
+            document.getElementById('cert-client-rut').value = decodeURIComponent(rut);
+        }
+        if (direccion) {
+            document.getElementById('cert-client-address').value = decodeURIComponent(direccion);
+        }
+    }
+
+    // --- LÓGICA DE FOLIO CORRELATIVO ---
+    function inicializarFolio() {
+        // Usamos una clave de localStorage DIFERENTE para el folio de certificado
+        const folioGuardado = localStorage.getItem('folioCertificado');
+        const folioInicial = 3001; // Puedes cambiar esto
+        let folioActual;
+        
+        if (folioGuardado && parseInt(folioGuardado) >= folioInicial) {
+            folioActual = parseInt(folioGuardado);
+        } else {
+            folioActual = folioInicial;
+        }
+        
+        certNumberInput.value = `EC-CERT-${folioActual}`;
+    }
+
+
+    // --- INICIALIZACIÓN ---
+    document.getElementById('cert-install-date').valueAsDate = new Date(); // Poner fecha de hoy por defecto
+    certNotesTextarea.value = "Garantía de instalación: 1 año (fugas en tuercas/soldaduras).\nGarantía de equipos: 3 años para equipos vendidos por EasyCool.\nNota: La garantía del fabricante puede requerir mantenciones periódicas.";
+    
+    // Habilitar botón si ya hay texto (p.ej. al recargar)
+    if (clientNameInput.value.trim() !== '') {
+         generateCertificateBtn.disabled = false;
+    }
+    
+    createEquipoRow(); // Crear la primera fila de equipo al cargar
+    poblarDatosDelDashboard(); // Poblar datos del Dashboard al cargar
+    inicializarFolio(); // Inicializar el folio correlativo
+});
+</script>
+
+</body>
+</html>
+
