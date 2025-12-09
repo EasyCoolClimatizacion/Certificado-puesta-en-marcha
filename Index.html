@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificado de Instalación v5.0 (Múltiple) - EasyCool</title>
+    <title>Certificado de Instalación v5.3 (Firmas Alineadas) - EasyCool</title>
     <!-- 
-      Versión 5.0 (Corregida):
-      - Mueve todos los parámetros (incluyendo fotos y drenaje) a cada equipo.
-      - Mueve todas las fotos a un "Anexo Fotográfico" al final.
-      - Aumenta el tamaño de fuente en la impresión.
-      - Saltos de página forzados antes de Fotos y Checklist.
-      - CORRECCIÓN: Se permite que los bloques de equipo se corten entre páginas (para evitar hojas en blanco).
+      Versión 5.3:
+      - Corrección de posición de firmas (Técnico Izq / Cliente Der).
+      - Alineación visual Formulario vs PDF.
     -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -76,6 +73,11 @@
             opacity: 1;
             transform: scale(1.1);
         }
+        /* Estilos para el Canvas de Firma */
+        canvas.signature-pad {
+            touch-action: none; /* Prevenir scroll al firmar en móvil */
+            cursor: crosshair;
+        }
 
         @media print {
             body { 
@@ -90,43 +92,25 @@
                 border: none !important; 
                 padding: 0 !important; 
                 margin: 0 !important;
-                /* CORRECCIÓN: Aumentar tamaño de letra base en impresión */
-                font-size: 1rem; /* 16px */
-            }
-            /* CORRECCIÓN: Ajustar tamaños relativos para la impresión */
-            .printable-section .text-sm {
-                font-size: 0.95rem; /* 15px */
-            }
-            .printable-section .text-xs {
-                font-size: 0.8rem; /* 13px */
-            }
-            
-            /* --- INICIO CORRECCIÓN DE IMPRESIÓN --- */
-            
-            /* CORRECCIÓN: Se quita la regla 'page-break-inside: avoid' para permitir que los bloques se corten */
-            /* .equipo-item-print {
-                page-break-inside: avoid; 
-            } */
-
-            .print-photo-container {
-                grid-template-columns: repeat(2, 1fr) !important;
-            }
-            
-            /* Salto de página forzado ANTES de las fotos */
-            #certificate-photos-section {
-                page-break-before: always; 
-            }
-            .photo-block-print {
                 page-break-inside: avoid;
             }
-            /* Salto de página forzado ANTES del checklist/notas */
+            .print-no-border {
+                border: none !important;
+                background-color: #ffffff !important;
+                box-shadow: none !important;
+            }
+            .equipo-item-print {
+                page-break-inside: avoid; /* Evitar que se corte un equipo entre páginas */
+            }
+            #certificate-parameters-section {
+                page-break-before: always;
+            }
             #certificate-verification-section {
                 page-break-before: always;
             }
             .photo-item {
                 page-break-inside: avoid;
             }
-            /* --- FIN CORRECCIÓN DE IMPRESIÓN --- */
         }
     </style>
 </head>
@@ -145,11 +129,10 @@
     <!-- SECCIÓN DE FORMULARIO (NO SE IMPRIME) -->
     <div class="max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-2xl mb-8 no-print calculator-section">
         
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Certificado de Puesta en Marcha v5.0</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Certificado de Puesta en Marcha v5.3</h2>
         
         <!-- Datos Cliente y Técnico -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 border-b pb-6 mb-6">
-            <!-- CORRECCIÓN: Se quita 'readonly' para permitir edición manual -->
             <input type="text" id="cert-client-name" placeholder="Nombre del Cliente" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             <input type="text" id="cert-client-rut" placeholder="RUT del Cliente" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             <input type="text" id="cert-client-address" placeholder="Dirección del Cliente" class="md:col-span-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -158,10 +141,10 @@
             <input type="text" id="cert-number" placeholder="N° Certificado" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100" readonly>
             
             <input type="date" id="cert-install-date" class="block w-full rounded-md border-gray-300 shadow-sm text-gray-500 focus:border-indigo-500 focus:ring-indigo-500" title="Fecha de Instalación">
-            <input type="text" id="cert-technician" value="Jose Guerrero" class="md:col-span-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <input type="text" id="cert-technician" value="Jose Guerrero" placeholder="Nombre del Técnico" class="md:col-span-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             
             <div class="md:col-span-2">
-                <label for="cert-supply" class="block text-sm font-medium text-gray-700">Suministro de Equipo</slabel>
+                <label for="cert-supply" class="block text-sm font-medium text-gray-700">Suministro de Equipo</label>
                 <select id="cert-supply" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     <option value="Suministrado por EasyCool Climatización">Suministrado por EasyCool Climatización</option>
                     <option value="Suministrado por el Cliente">Suministrado por el Cliente</option>
@@ -169,7 +152,7 @@
             </div>
         </div>
 
-        <!-- (NUEVO) Datos Equipos (Dinámico) -->
+        <!-- Datos Equipos (Dinámico) -->
         <div class="border-b pb-4 mb-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Equipos Instalados</h3>
             <div id="equipos-container" class="space-y-4">
@@ -181,10 +164,52 @@
         </div>
 
 
-        <!-- SECCIÓN GLOBAL (SOLO NOTAS E INSTRUCCIÓN) -->
+        <!-- Parámetros Técnicos (Comunes) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 border-b pb-6 mb-6">
+            <h3 class="md:col-span-3 text-lg font-semibold text-gray-800">Parámetros Técnicos Generales</h3>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Vacío (Micrones)</label>
+                <input type="number" id="cert-vacuum" placeholder="250" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Tiempo Vacío (Mins)</label>
+                <input type="number" id="cert-vacuum-time" placeholder="30" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Refrigerante</label>
+                <input type="text" id="cert-refrigerant" value="R410A" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+        </div>
+
+        <!-- Checklist Fotográfico y Notas -->
         <div>
-            <h3 class="text-lg font-semibold text-gray-800">Checklist y Notas Globales</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Checklist y Registro Fotográfico</h3>
             <div class="space-y-4 mt-4">
+                <!-- Foto Vacuómetro -->
+                <div>
+                    <div class="flex items-center">
+                        <input id="cert-check-photo-vacuum" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <label for="cert-check-photo-vacuum" class="ml-3 block text-sm font-medium text-gray-900">Foto Vacuómetro (Lectura Micrones)</label>
+                    </div>
+                    <div class="file-input-container">
+                        <input type="file" id="cert-photo-file-vacuum" accept="image/*" class="custom-file-input">
+                    </div>
+                </div>
+                <!-- Foto Manómetros (General) -->
+                <div>
+                    <div class="flex items-center">
+                        <input id="cert-check-photo-pressure" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                        <label for="cert-check-photo-pressure" class="ml-3 block text-sm font-medium text-gray-900">Foto Manómetros (Presión de Trabajo General)</label>
+                    </div>
+                    <div class="file-input-container">
+                        <input type="file" id="cert-photo-file-pressure" accept="image/*" class="custom-file-input">
+                    </div>
+                </div>
+                <!-- Otros Checks -->
+                <div class="flex items-center pt-2">
+                    <input id="cert-check-drain" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="cert-check-drain" class="ml-3 block text-sm text-gray-900">Prueba de Drenaje (Bandeja y Manguera) OK</label>
+                </div>
                 <div class="flex items-center">
                     <input id="cert-check-briefing" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                     <label for="cert-check-briefing" class="ml-3 block text-sm text-gray-900">Instrucción al cliente (Uso, Filtros, Mantención) OK</label>
@@ -192,8 +217,37 @@
             </div>
             
             <div class="mt-6">
-                <label class="block text-sm font-medium text-gray-700">Notas Adicionales (Globales)</label>
+                <label class="block text-sm font-medium text-gray-700">Notas Adicionales</label>
                 <textarea id="cert-notes" rows="4" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Detalles de la instalación, ubicación de equipos, etc..."></textarea>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE FIRMAS DIGITALES (ALINEADA A PDF) -->
+        <div class="mt-8 border-t pt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Firmas de Aceptación</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Firma Técnico (IZQUIERDA) -->
+                <div>
+                    <p class="text-sm font-medium text-gray-700 mb-2">Firma del Técnico (Responsable):</p>
+                    <div class="border-2 border-dashed border-blue-300 rounded-lg p-2 bg-blue-50">
+                        <canvas id="signature-pad-tech" class="signature-pad w-full h-32 bg-white rounded border border-blue-200 shadow-inner"></canvas>
+                    </div>
+                    <div class="flex justify-end mt-1">
+                        <button type="button" id="clear-signature-tech" class="text-xs text-red-600 font-medium hover:text-red-800 underline">Borrar</button>
+                    </div>
+                </div>
+
+                <!-- Firma Cliente (DERECHA) -->
+                <div>
+                    <p class="text-sm font-medium text-gray-700 mb-2">Firma del Cliente (Recepción):</p>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-2 bg-gray-50">
+                        <canvas id="signature-pad-client" class="signature-pad w-full h-32 bg-white rounded border border-gray-200 shadow-inner"></canvas>
+                    </div>
+                    <div class="flex justify-end mt-1">
+                        <button type="button" id="clear-signature-client" class="text-xs text-red-600 font-medium hover:text-red-800 underline">Borrar</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -214,7 +268,7 @@
             <header class="flex justify-between items-start pb-6 border-b-2 border-gray-200">
                 <div class="w-2/5">
                      <svg viewBox="0 0 250 50" class="h-12 w-auto" aria-label="Logo de EasyCool">
-                         <g transform="translate(0, -2.5) scale(0.9)"><rect y="5" width="50" height="10" rx="5" fill="#3B82F6" opacity="0.8"></rect><rect x="5" y="20" width="45" height="10" rx="5" fill="#60A5FA" opacity="0.9"></rect><rect x="10" y="35" width="40" height="10" rx="5" fill="#93C5FD"></rect></g><text x="60" y="22" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#1f2937">EASYCOOL</text><text x="60" y="40" font-family="Inter, sans-serif" font-size="14" font-weight="400" fill="#6b7280">Climatización</text>
+                        <g transform="translate(0, -2.5) scale(0.9)"><rect y="5" width="50" height="10" rx="5" fill="#3B82F6" opacity="0.8"></rect><rect x="5" y="20" width="45" height="10" rx="5" fill="#60A5FA" opacity="0.9"></rect><rect x="10" y="35" width="40" height="10" rx="5" fill="#93C5FD"></rect></g><text x="60" y="22" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#1f2937">EASYCOOL</text><text x="60" y="40" font-family="Inter, sans-serif" font-size="14" font-weight="400" fill="#6b7280">Climatización</text>
                      </svg>
                 </div>
                 <div class="w-3/5 text-right text-sm text-gray-600 space-y-1">
@@ -226,11 +280,11 @@
                 </div>
             </header>
             
-            <main class="mt-8"> <!-- La clase 'text-base' se aplicará por CSS -->
+            <main class="mt-8">
                 <!-- TÍTULO Y NÚMERO -->
                 <div class="text-center mb-8">
                     <h1 class="text-2xl font-bold text-gray-900">CERTIFICADO DE PUESTA EN MARCHA</h1>
-                    <p class="text-gray-700 mt-1"> <!-- 'text-sm' se ajustará por CSS -->
+                    <p class="text-sm text-gray-700 mt-1">
                         <strong>N° Certificado:</strong> <span id="print-cert-number" contenteditable="true" class="font-medium"></span>
                     </p>
                 </div>
@@ -238,7 +292,7 @@
                 <!-- SECCIONES EN CAJAS -->
                 <section class="mb-6">
                     <h2 class="text-lg font-semibold text-blue-700 border-b-2 border-blue-100 pb-2 mb-4">Datos del Cliente</h2>
-                    <div class="grid grid-cols-2 gap-x-6 gap-y-2"> <!-- 'text-sm' se ajustará por CSS -->
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                         <div><strong>Cliente:</strong> <span id="print-cert-client-name" contenteditable="true"></span></div>
                         <div><strong>RUT:</strong> <span id="print-cert-client-rut" contenteditable="true"></span></div>
                         <div class="col-span-2"><strong>Dirección:</strong> <span id="print-cert-client-address" contenteditable="true"></span></div>
@@ -248,49 +302,65 @@
                     </div>
                 </section>
                 
-                <!-- (NUEVO) Sección de Equipos (Dinámica) -->
+                <!-- Sección de Equipos (Dinámica) -->
                 <section class="mb-6" id="certificate-equipos-section">
                     <h2 class="text-lg font-semibold text-blue-700 border-b-2 border-blue-100 pb-2 mb-4">Datos y Parámetros de Equipos Instalados</h2>
-                    <!-- Contenedor para los equipos impresos -->
-                    <div id="print-equipos-container" class="space-y-6">
+                    <div id="print-equipos-container" class="space-y-4">
                         <!-- Los equipos y sus parámetros se insertarán aquí -->
                     </div>
                 </section>
                 
-                <!-- NUEVO: SECCIÓN DE FOTOS ANEXAS -->
-                <section class="mb-8" id="certificate-photos-section">
-                    <h2 class="text-lg font-semibold text-blue-700 border-b-2 border-blue-100 pb-2 mb-4">Registro Fotográfico Adjunto</h2>
-                    <div id="print-photos-container" class="space-y-6">
-                        <!-- Los bloques de fotos por equipo se insertarán aquí -->
+                <section class="mb-6" id="certificate-parameters-section">
+                    <h2 class="text-lg font-semibold text-blue-700 border-b-2 border-blue-100 pb-2 mb-4">Parámetros Generales de Instalación</h2>
+                    <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm bg-gray-50 p-4 rounded-lg">
+                        <div><strong>Vacío Alcanzado:</strong> <span id="print-cert-vacuum" contenteditable="true"></span> Micrones</div>
+                        <div><strong>Tiempo de Vacío:</strong> <span id="print-cert-vacuum-time" contenteditable="true"></span> Minutos</div>
+                        <div><strong>Refrigerante:</strong> <span id="print-cert-refrigerant" contenteditable="true"></span></div>
                     </div>
                 </section>
                 
                 <section class="mb-8" id="certificate-verification-section">
-                    <!-- CORRECCIÓN: Ahora es solo el checklist global -->
-                    <h2 class="text-lg font-semibold text-blue-700 border-b-2 border-blue-100 pb-2 mb-4">Checklist Global</h2>
-                    <!-- CORRECCIÓN: Se quita la grilla y se deja como lista simple -->
-                    <div id="print-cert-checklist" class="space-y-2"> <!-- 'text-sm' se ajustará por CSS -->
-                        <!-- Items de checklist global se insertarán aquí -->
+                    <h2 class="text-lg font-semibold text-blue-700 border-b-2 border-blue-100 pb-2 mb-4">Checklist y Registro Fotográfico</h2>
+                    <div id="print-cert-checklist" class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                        <!-- Items de checklist se insertarán aquí -->
                     </div>
                     
                     <div class="mt-6">
-                        <h3 class="font-semibold text-gray-800">Notas Adicionales:</h3> <!-- 'text-sm' se ajustará por CSS -->
-                        <p id="print-cert-notes" class="text-gray-700 whitespace-pre-wrap border border-gray-200 p-3 rounded-md bg-gray-50 mt-2" contenteditable="true"></p> <!-- 'text-sm' se ajustará por CSS -->
+                        <h3 class="text-sm font-semibold text-gray-800">Registro Fotográfico Adjunto:</h3>
+                        <!-- AQUI SE INSERTARÁN LAS IMÁGENES -->
+                        <div id="print-cert-photo-container" class="grid grid-cols-2 gap-4 mt-2">
+                            <!-- Las imágenes se cargarán aquí -->
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-sm font-semibold text-gray-800">Notas Adicionales:</h3>
+                        <p id="print-cert-notes" class="text-sm text-gray-700 whitespace-pre-wrap border border-gray-200 p-3 rounded-md bg-gray-50" contenteditable="true"></p>
                     </div>
                 </section>
                 
                 <!-- Firmas -->
-                <section class="mt-24 pt-8 flex justify-around text-center">
-                    <div class="w-2/5">
-                        <div class="border-t-2 border-gray-400 pt-2">
-                            <p class="font-semibold" contenteditable="true" id="print-cert-footer-tecnico">Jose Guerrero</p> <!-- 'text-sm' se ajustará por CSS -->
-                            <p class="text-gray-600">Técnico EasyCool Climatización</p> <!-- 'text-xs' se ajustará por CSS -->
+                <section class="mt-16 pt-8 flex justify-around text-center">
+                    
+                    <!-- COLUMNA TÉCNICO (IZQUIERDA) -->
+                    <div class="w-2/5 relative">
+                        <div class="absolute bottom-10 left-0 right-0 mx-auto w-32 h-20 flex items-end justify-center pointer-events-none">
+                            <img id="print-signature-image-tech" class="max-w-full max-h-full object-contain" style="display:none;">
+                        </div>
+                        <div class="border-t-2 border-gray-400 pt-2 relative z-10">
+                            <p class="text-sm font-semibold" contenteditable="true" id="print-cert-footer-tecnico">Jose Guerrero</p>
+                            <p class="text-xs text-gray-600">Técnico Certificado</p>
                         </div>
                     </div>
-                    <div class="w-2/5">
-                        <div class="border-t-2 border-gray-400 pt-2">
-                            <p class="font-semibold">Firma del Cliente</p> <!-- 'text-sm' se ajustará por CSS -->
-                            <p class="text-gray-600">Recibí Conforme</p> <!-- 'text-xs' se ajustará por CSS -->
+
+                    <!-- COLUMNA CLIENTE (DERECHA) -->
+                    <div class="w-2/5 relative">
+                        <div class="absolute bottom-10 left-0 right-0 mx-auto w-32 h-20 flex items-end justify-center pointer-events-none">
+                             <img id="print-signature-image-client" class="max-w-full max-h-full object-contain" style="display:none;">
+                         </div>
+                        <div class="border-t-2 border-gray-400 pt-2 relative z-10">
+                            <p class="text-sm font-semibold" id="print-cert-footer-cliente">Firma del Cliente</p>
+                            <p class="text-xs text-gray-600">Recibí Conforme</p>
                         </div>
                     </div>
                 </section>
@@ -307,6 +377,99 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     
+    // --- LÓGICA DE FIRMA DIGITAL (CLASE REUTILIZABLE O FUNCIÓN) ---
+    function initSignaturePad(canvasId, clearBtnId) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        const clearBtn = document.getElementById(clearBtnId);
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            // Solo redimensionar si el elemento es visible y tiene tamaño
+            if(canvas.offsetWidth > 0) {
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                ctx.scale(ratio, ratio);
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        // Llamar al inicio para configurar
+        setTimeout(resizeCanvas, 500); // Retardo para asegurar renderizado
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+            
+            // Soporte Touch
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            }
+
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const pos = getPos(e);
+            lastX = pos.x;
+            lastY = pos.y;
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault(); // Prevenir scroll en touch
+            
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.strokeStyle = '#000'; // Color firma
+            if (canvasId.includes('tech')) ctx.strokeStyle = '#1e3a8a'; // Azul para técnico (opcional)
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            
+            lastX = pos.x;
+            lastY = pos.y;
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+        }
+
+        // Event Listeners Mouse
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        // Event Listeners Touch
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+
+        clearBtn.addEventListener('click', clearCanvas);
+        
+        return canvas;
+    }
+
+    // Inicializar ambos pads
+    const clientPad = initSignaturePad('signature-pad-client', 'clear-signature-client');
+    const techPad = initSignaturePad('signature-pad-tech', 'clear-signature-tech');
+
+
     // --- LÓGICA PARA CERTIFICADO ---
 
     // Selectores DOM Certificado
@@ -333,11 +496,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let equipoCount = 0;
     function createEquipoRow() {
         equipoCount++;
-        const uniqueId = Date.now() + '-' + equipoCount; // ID único para los labels/inputs de fotos
         const div = document.createElement('div');
         div.className = 'equipo-item-form grid grid-cols-1 md:grid-cols-12 gap-3 bg-gray-50 p-3 rounded-lg border';
-        
-        // Plantilla de Equipo
         div.innerHTML = `
             <div class="md:col-span-12 flex justify-between items-center">
                 <h4 class="font-semibold text-gray-800">Equipo #${equipoCount}</h4>
@@ -347,9 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </svg>
                 </button>
             </div>
-            
             <!-- Fila 1: Datos UI -->
-            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Datos Unidad Interior</h5>
             <div class="md:col-span-4">
                 <input type="text" class="cert-ui-brand block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Marca UI">
             </div>
@@ -359,9 +517,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="md:col-span-4">
                 <input type="text" class="cert-ui-serial block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="N° Serie UI">
             </div>
-
             <!-- Fila 2: Datos UE -->
-            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Datos Unidad Exterior</h5>
             <div class="md:col-span-4">
                 <input type="text" class="cert-ue-brand block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Marca UE">
             </div>
@@ -371,9 +527,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="md:col-span-4">
                 <input type="text" class="cert-ue-serial block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="N° Serie UE">
             </div>
-
-            <!-- Fila 3: Mediciones Operativas -->
-            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Parámetros Operativos (Modo Frío) - Equipo #${equipoCount}</h5>
+            <!-- Fila 3: Mediciones -->
+            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Parámetros (Modo Frío) - Equipo #${equipoCount}</h5>
             <div class="md:col-span-3">
                 <input type="number" class="cert-pressure-low block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Presión Baja (PSI)">
             </div>
@@ -390,50 +545,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <input type="number" class="cert-temp-in block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="T. Iny (°C)">
                 <input type="number" class="cert-temp-out block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="T. Ret (°C)">
             </div>
-
-            <!-- Fila 4: Parámetros de Instalación (Movido aquí) -->
-            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Parámetros de Instalación - Equipo #${equipoCount}</h5>
-            <div class="md:col-span-4">
-                 <input type="number" class="cert-vacuum block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Vacío (Micrones)">
-            </div>
-            <div class="md:col-span-4">
-                 <input type="number" class="cert-vacuum-time block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Tiempo Vacío (Mins)">
-            </div>
-            <div class="md:col-span-4">
-                 <input type="text" class="cert-refrigerant block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Refrigerante (ej: R410A)">
-            </div>
-            
-            <!-- Fila 5: Checklist y Fotos (Movido aquí) -->
-            <h5 class="md:col-span-12 text-sm font-medium text-gray-700 mt-2">Checklist y Fotos - Equipo #${equipoCount}</h5>
-            
-            <div class="md:col-span-12">
-                 <div class="flex items-center">
-                    <input id="cert-check-drain-${uniqueId}" type="checkbox" class="cert-check-drain h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="cert-check-drain-${uniqueId}" class="ml-3 block text-sm font-medium text-gray-900">Prueba de Drenaje (Bandeja y Manguera) OK</Slabel>
-                 </div>
-            </div>
-
-            <div class="md:col-span-6">
-                 <div class="flex items-center">
-                    <input id="cert-check-photo-vacuum-${uniqueId}" type="checkbox" class="cert-check-photo-vacuum h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="cert-check-photo-vacuum-${uniqueId}" class="ml-3 block text-sm font-medium text-gray-900">Foto Vacuómetro</label>
-                 </div>
-                 <div class="file-input-container">
-                    <input type="file" id="cert-photo-file-vacuum-${uniqueId}" class="cert-photo-file-vacuum custom-file-input" accept="image/*">
-                 </div>
-            </div>
-            
-            <div class="md:col-span-6">
-                 <div class="flex items-center">
-                    <input id="cert-check-photo-pressure-${uniqueId}" type="checkbox" class="cert-check-photo-pressure h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="cert-check-photo-pressure-${uniqueId}" class="ml-3 block text-sm font-medium text-gray-900">Foto Manómetros</label>
-                 </div>
-                 <div class="file-input-container">
-                    <input type="file" id="cert-photo-file-pressure-${uniqueId}" class="cert-photo-file-pressure custom-file-input" accept="image/*">
-                 </div>
-            </div>
         `;
-        
         equiposContainer.appendChild(div);
 
         // Ocultar botón de eliminar si es el único equipo
@@ -459,15 +571,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateRemoveButtons();
                 // Re-numerar equipos
                 equipoCount = 0;
-                equiposContainer.querySelectorAll('h4').forEach((h4, index) => {
-                    equipoCount = index + 1;
+                equiposContainer.querySelectorAll('h4').forEach(h4 => {
+                    equipoCount++;
                     h4.textContent = `Equipo #${equipoCount}`;
-                    // Actualizar también los subtítulos
-                    row.querySelectorAll('h5').forEach(h5 => {
-                        if(h5.textContent.includes('Equipo #')) {
-                            h5.textContent = h5.textContent.replace(/Equipo #\d+/, `Equipo #${equipoCount}`);
-                        }
-                    });
                 });
             }, 300);
         }
@@ -477,9 +583,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Función para leer archivo como Data URL (para incrustar imagen) ---
     const readFileAsDataURL = (file) => {
         return new Promise((resolve, reject) => {
-            if (!file) {
-                resolve(null); // Resuelve null si no hay archivo
-            }
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result);
             reader.onerror = (error) => reject(error);
@@ -487,14 +590,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- Función para crear el ícono de Check (✓) o Cruz (✗) ---
-    function createCheckIcon(isChecked) {
-        const icon = isChecked ? '✓' : '✗';
-        const color = isChecked ? 'text-green-600' : 'text-red-500';
-        return `<span class="font-bold ${color} mr-2 text-lg">${icon}</span>`;
-    }
-
-    // --- Generar Certificado ---
+    // Generar Certificado
     generateCertificateBtn.addEventListener('click', async () => {
         // Mostrar estado de carga
         btnText.style.display = 'none';
@@ -512,6 +608,21 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('print-cert-client-rut').textContent = document.getElementById('cert-client-rut').value;
             document.getElementById('print-cert-client-address').textContent = document.getElementById('cert-client-address').value;
             
+            // --- NUEVO: Poner Nombre en el Pie de Firma ---
+            document.getElementById('print-cert-footer-cliente').textContent = clienteNombre || "Firma del Cliente";
+
+            // --- NUEVO: Procesar Firmas Digitales ---
+            const signatureImgClient = document.getElementById('print-signature-image-client');
+            const dataUrlClient = clientPad.toDataURL('image/png');
+            signatureImgClient.src = dataUrlClient;
+            signatureImgClient.style.display = 'block';
+
+            const signatureImgTech = document.getElementById('print-signature-image-tech');
+            const dataUrlTech = techPad.toDataURL('image/png');
+            signatureImgTech.src = dataUrlTech;
+            signatureImgTech.style.display = 'block';
+
+
             const rawDate = document.getElementById('cert-install-date').value;
             if (rawDate) {
                 const installDate = new Date(rawDate + 'T00:00:00'); // Corregir zona horaria
@@ -529,20 +640,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const folio = certNumberInput.value;
             document.getElementById('print-cert-number').textContent = folio;
 
-            // 3. Poblar Equipos Múltiples
+            // 3. Poblar Parámetros Generales
+            // (Nota: Estos elementos son globales, no por equipo en esta sección)
+            document.getElementById('print-cert-refrigerant').textContent = document.getElementById('cert-refrigerant').value || 'N/A';
+            document.getElementById('print-cert-vacuum').textContent = document.getElementById('cert-vacuum').value || 'N/A';
+            document.getElementById('print-cert-vacuum-time').textContent = document.getElementById('cert-vacuum-time').value || 'N/A';
+            
+            // 4. (NUEVO) Poblar Equipos Múltiples
             const printEquiposContainer = document.getElementById('print-equipos-container');
             printEquiposContainer.innerHTML = '';
             const equipoItems = equiposContainer.querySelectorAll('.equipo-item-form');
-            
-            // NUEVO: Array para guardar los bloques de fotos
-            let allPhotosHtmlBlocks = [];
 
-            // Usamos un bucle 'for...of' para poder usar 'await' dentro
-            let equipoIndex = 0;
-            for (const item of equipoItems) {
-                equipoIndex++;
-                
-                // Datos de Texto
+            equipoItems.forEach((item, index) => {
                 const ui_brand = item.querySelector('.cert-ui-brand').value || 'N/A';
                 const ui_model = item.querySelector('.cert-ui-model').value || 'N/A';
                 const ui_serial = item.querySelector('.cert-ui-serial').value || 'N/A';
@@ -557,71 +666,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const tempIn = parseFloat(item.querySelector('.cert-temp-in').value);
                 const tempOut = parseFloat(item.querySelector('.cert-temp-out').value);
 
-                const vacuum = item.querySelector('.cert-vacuum').value || 'N/A';
-                const vacuumTime = item.querySelector('.cert-vacuum-time').value || 'N/A';
-                const refrigerant = item.querySelector('.cert-refrigerant').value || 'N/A';
-
-                // Cálculo de Salto Térmico (ΔT)
                 let saltoTermico = 'N/A';
-                if (!isNaN(tempIn) && !isNaN(tempOut) && tempOut > tempIn) { // Modo Frío
+                if (!isNaN(tempIn) && !isNaN(tempOut) && tempOut > tempIn) {
                     saltoTermico = (tempOut - tempIn).toFixed(1) + ' °C';
-                } else if (!isNaN(tempIn) && !isNaN(tempOut)) { // Modo Calor o sin diferencia
-                    saltoTermico = (tempIn - tempOut).toFixed(1) + ' °C';
                 }
 
-                // Datos de Checklist por Equipo
-                const checkDrain = item.querySelector('.cert-check-drain').checked;
-                const checkVacuumPhoto = item.querySelector('.cert-check-photo-vacuum').checked;
-                const checkPressurePhoto = item.querySelector('.cert-check-photo-pressure').checked;
-
-                // Datos de Fotos por Equipo (usamos 'await' aquí)
-                const fileVacuum = item.querySelector('.cert-photo-file-vacuum').files[0];
-                const filePressure = item.querySelector('.cert-photo-file-pressure').files[0];
-                
-                const dataUrlVacuum = await readFileAsDataURL(fileVacuum);
-                const dataUrlPressure = await readFileAsDataURL(filePressure);
-
-                // Construir el HTML de las fotos
-                let photosHTML = '';
-                if (dataUrlVacuum) {
-                    photosHTML += `
-                        <div class="photo-item border p-2 rounded-lg shadow-sm">
-                            <img src="${dataUrlVacuum}" alt="Foto Vacuómetro" class="w-full h-auto object-cover rounded-md mb-2">
-                            <p class="text-xs text-center text-gray-700 font-medium">Foto Vacuómetro</p>
-                        </div>`;
-                }
-                if (dataUrlPressure) {
-                    photosHTML += `
-                        <div class="photo-item border p-2 rounded-lg shadow-sm">
-                            <img src="${dataUrlPressure}" alt="Foto Manómetros" class="w-full h-auto object-cover rounded-md mb-2">
-                            <p class="text-xs text-center text-gray-700 font-medium">Foto Manómetros</p>
-                        </div>`;
-                }
-                
-                // NUEVO: Guardar el bloque de fotos en el array, si hay fotos
-                if (photosHTML !== '') {
-                    allPhotosHtmlBlocks.push(`
-                        <div class="photo-block-print">
-                            <h4 class="text-base font-semibold text-gray-900 mb-3">Registro Fotográfico (Equipo #${equipoIndex})</h4>
-                            <div class="print-photo-container grid grid-cols-2 gap-4 mt-2">
-                                ${photosHTML}
-                            </div>
-                        </div>
-                    `);
-                }
-
-
-                // Crear el div principal del equipo
                 const equipoDiv = document.createElement('div');
                 equipoDiv.className = 'equipo-item-print bg-gray-50 p-4 rounded-lg border';
-                
-                // NUEVO: Plantilla de equipo SIN la sección de fotos
-                // CORRECCIÓN: Se quitan clases 'text-sm' para que hereden el 'text-base'
                 equipoDiv.innerHTML = `
-                    <h4 class="text-base font-semibold text-gray-900 mb-3">Equipo #${equipoIndex}</h4>
-                    
-                    <!-- Datos UI/UE -->
-                    <div class="grid grid-cols-2 gap-x-6 gap-y-2">
+                    <h4 class="text-base font-semibold text-gray-900 mb-3">Equipo #${index + 1}</h4>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                         <div class="font-medium text-gray-800 col-span-2">Unidad Interior</div>
                         <div><strong>Marca:</strong> ${ui_brand}</div>
                         <div><strong>Modelo:</strong> ${ui_model}</div>
@@ -631,59 +685,80 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div><strong>Marca:</strong> ${ue_brand}</div>
                         <div><strong>Modelo:</strong> ${ue_model}</div>
                         <div class="col-span-2"><strong>N° Serie:</strong> <span class="font-mono">${ue_serial}</span></div>
-                    </div>
 
-                    <!-- Parámetros Operativos -->
-                    <h5 class="font-medium text-gray-800 pt-3 mt-3 border-t col-span-2">Parámetros Operativos (Modo Frío)</h5>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 mt-2">
+                        <div class="font-medium text-gray-800 pt-3 mt-3 border-t col-span-2">Parámetros del Equipo</div>
                         <div><strong>Voltaje:</strong> ${voltaje} V</div>
                         <div><strong>Consumo:</strong> ${consumo} A</div>
                         <div><strong>Presión Baja:</strong> ${pBaja} PSI</div>
                         <div><strong>Presión Alta:</strong> ${pAlta} PSI</div>
-                        <div class="font-bold col-span-2 md:col-span-1">ΔT: <span class="text-blue-700">${saltoTermico}</span></div>
-                    </div>
-                    
-                    <!-- Parámetros de Instalación -->
-                    <h5 class="font-medium text-gray-800 pt-3 mt-3 border-t col-span-2">Parámetros de Instalación (Equipo)</h5>
-                    <div class="grid grid-cols-3 gap-x-6 gap-y-2 mt-2">
-                        <div><strong>Refrigerante:</strong> ${refrigerant}</div>
-                        <div><strong>Vacío:</strong> ${vacuum} Micrones</div>
-                        <div><strong>Tiempo Vacío:</strong> ${vacuumTime} Min.</div>
-                    </div>
-
-                    <!-- Checklist por Equipo -->
-                    <h5 class="font-medium text-gray-800 pt-3 mt-3 border-t col-span-2">Checklist (Equipo)</h5>
-                    <div class="mt-2 space-y-1">
-                        <div class="flex items-center">${createCheckIcon(checkDrain)} Prueba de Drenaje OK</div>
-                        <div classf="flex items-center">${createCheckIcon(checkVacuumPhoto)} Foto Vacuómetro OK</div>
-                        <div class="flex items-center">${createCheckIcon(checkPressurePhoto)} Foto Manómetros OK</div>
+                        <div class="font-bold">Salto Térmico (ΔT): <span class="text-blue-700">${saltoTermico}</span></div>
                     </div>
                 `;
                 printEquiposContainer.appendChild(equipoDiv);
-            }
+            });
 
-            // 4. NUEVO: Poblar la sección de fotos anexa
-            const printPhotosContainer = document.getElementById('print-photos-container');
-            if (allPhotosHtmlBlocks.length > 0) {
-                printPhotosContainer.innerHTML = allPhotosHtmlBlocks.join('<div class="h-6"></div>'); // Añade un espacio entre bloques de fotos
-            } else {
-                printPhotosContainer.innerHTML = '<p class="text-gray-500">No se adjuntaron registros fotográficos.</p>';
-            }
 
-            // 5. Poblar Checklist Global
+            // 5. Poblar Checklist
             const checklistContainer = document.getElementById('print-cert-checklist');
-            checklistContainer.innerHTML = ''; // Limpiar
+            checklistContainer.innerHTML = '';
+            const checks = [
+                { id: 'cert-check-photo-vacuum', label: 'Verificación Vacuómetro (Micrones)' },
+                { id: 'cert-check-photo-pressure', label: 'Verificación Presión de Trabajo' },
+                { id: 'cert-check-drain', label: 'Prueba de Drenaje OK' },
+                { id: 'cert-check-briefing', label: 'Instrucción al Cliente OK' },
+            ];
+            checks.forEach(check => {
+                const isChecked = document.getElementById(check.id).checked;
+                const icon = isChecked ? '✓' : '✗';
+                const color = isChecked ? 'text-green-600' : 'text-red-500';
+                checklistContainer.innerHTML += `<div class="flex items-center"><span class="font-bold ${color} mr-2 text-lg">${icon}</span> ${check.label}</div>`;
+            });
+
+            // 6. Poblar Lista de Fotos
+            const printPhotoContainer = document.getElementById('print-cert-photo-container');
+            printPhotoContainer.innerHTML = ''; // Limpiar contenedor
             
-            const checkBriefing = document.getElementById('cert-check-briefing').checked;
-            checklistContainer.innerHTML += `<div class="flex items-center">${createCheckIcon(checkBriefing)} Instrucción al Cliente OK</div>`;
-            
-            // 6. Poblar Notas Globales
+            const photoInputs = [
+                { id: 'cert-photo-file-vacuum', label: 'Foto Lectura Vacuómetro' },
+                { id: 'cert-photo-file-pressure', label: 'Foto Lectura Manómetros' }
+            ];
+
+            let photoCount = 0;
+            for (const input of photoInputs) {
+                const fileInput = document.getElementById(input.id);
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    try {
+                        const dataUrl = await readFileAsDataURL(file);
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'photo-item border p-2 rounded-lg shadow-sm';
+                        imgContainer.innerHTML = `
+                            <img src="${dataUrl}" alt="${input.label}" class="w-full h-auto object-cover rounded-md mb-2">
+                            <p class="text-xs text-center text-gray-700 font-medium">${input.label}</p>
+                        `;
+                        printPhotoContainer.appendChild(imgContainer);
+                        photoCount++;
+                    } catch (error) {
+                        console.error('Error al leer el archivo de imagen:', error);
+                        const errorLi = document.createElement('div');
+                        errorLi.className = 'text-red-500 text-sm';
+                        errorLi.textContent = `Error al cargar ${input.label}`;
+                        printPhotoContainer.appendChild(errorLi);
+                    }
+                }
+            }
+
+            if (photoCount === 0) {
+                printPhotoContainer.innerHTML = '<p class="text-sm text-gray-500">No se adjuntaron archivos fotográficos.</p>';
+            }
+
+            // 7. Poblar Notas
             document.getElementById('print-cert-notes').textContent = document.getElementById('cert-notes').value;
 
-            // 7. Scroll para ver el resultado
+            // 8. Scroll para ver el resultado
             document.getElementById('certificate-section').scrollIntoView({ behavior: 'smooth' });
             
-            // 8. Configurar título para impresión y guardar siguiente folio
+            // 9. Configurar título para impresión y guardar siguiente folio
             const newTitle = `Certificado Nº${folio} - ${clienteNombre}`;
             document.title = newTitle;
 
@@ -695,8 +770,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         } catch (error) {
             console.error("Error al generar el certificado:", error);
-            // Idealmente, mostrar esto en un modal de error, no un alert.
-            // alert("Ocurrió un error al generar el certificado. Revisa la consola para más detalles.");
+            alert("Ocurrió un error al generar el certificado. Revisa la consola para más detalles.");
         } finally {
             // Restaurar botón
             btnText.style.display = 'block';
@@ -756,10 +830,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('cert-install-date').valueAsDate = new Date(); // Poner fecha de hoy por defecto
     certNotesTextarea.value = "Garantía de instalación: 1 año (fugas en tuercas/soldaduras).\nGarantía de equipos: 3 años para equipos vendidos por EasyCool.\nNota: La garantía del fabricante puede requerir mantenciones periódicas.";
     
-    // Habilitar botón si ya hay texto (p.ej. al recargar)
-    if (clientNameInput.value.trim() !== '') {
-         generateCertificateBtn.disabled = false;
-    }
+    generateCertificateBtn.disabled = true; // Deshabilitado hasta que se escriba el nombre (o se reciba del dashboard)
     
     createEquipoRow(); // Crear la primera fila de equipo al cargar
     poblarDatosDelDashboard(); // Poblar datos del Dashboard al cargar
@@ -769,4 +840,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-
