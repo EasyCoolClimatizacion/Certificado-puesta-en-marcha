@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Certificado de Instalación v6.7 - EasyCool</title>
+    <title>Certificado de Instalación v7.0 - EasyCool</title>
     
     <!-- CONFIGURACIÓN DE ICONO (APP NATIVA) -->
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1830/1830182.png">
@@ -77,13 +77,25 @@
             h3 { font-size: 12px !important; margin-top: 0.5rem !important; }
             h4 { font-size: 12px !important; }
             p, span, div, strong, label { font-size: 10px !important; }
+            
             .equipo-item-print {
                 page-break-inside: avoid;
                 margin-bottom: 0.5rem !important;
                 border: 1px solid #e5e7eb !important;
                 padding: 0.5rem !important;
             }
+            
+            /* FUERZA VISIBILIDAD IMÁGENES */
             img { display: block !important; max-width: 100% !important; }
+            .print-photo-container {
+                height: 90px !important; /* Altura fija ajustada para 4 fotos */
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                background-color: #f3f4f6 !important;
+                border: 1px solid #e5e7eb !important;
+                overflow: hidden !important;
+            }
         }
     </style>
 </head>
@@ -103,7 +115,7 @@
         
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-900">Generar Certificado</h2>
-            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">v6.7 Native</span>
+            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">v7.0 Full</span>
         </div>
         
         <!-- Datos Cliente -->
@@ -115,7 +127,7 @@
             <!-- Folio EDITABLE -->
             <div class="relative">
                 <label class="absolute top-1 left-2 text-[10px] text-blue-600 font-bold">Folio (Editable)</label>
-                <input type="text" id="cert-number" class="block w-full rounded-lg border-gray-300 bg-white p-2.5 pt-5 text-sm font-mono font-bold text-gray-800 focus:border-blue-500 focus:ring-blue-500 shadow-sm" title="Puedes editar este número manualmente">
+                <input type="text" id="cert-number" class="block w-full rounded-lg border-gray-300 bg-white p-2.5 pt-5 text-sm font-mono font-bold text-gray-800 focus:border-blue-500 focus:ring-blue-500 shadow-sm">
             </div>
             
             <div class="relative">
@@ -412,20 +424,49 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div><label class="text-[10px] text-gray-500">T° Ret</label><input type="number" class="cert-temp-out w-full rounded border-gray-300 text-xs"></div>
                 </div>
             </div>
+            
+            <!-- FOTOS CON FEEDBACK DE NOMBRE -->
             <div class="md:col-span-12 mt-2">
                <h5 class="text-xs font-bold text-gray-700 mb-1">Evidencia (Fotos)</h5>
-               <div class="grid grid-cols-2 gap-2">
+               <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                    <div class="border border-dashed border-blue-300 p-2 rounded bg-blue-50">
                        <label class="text-[10px] text-blue-600 block mb-1">Vacuómetro</label>
-                       <input type="file" class="cert-photo-vacuum custom-file-input w-full" accept="image/*">
+                       <input type="file" class="cert-photo-vacuum custom-file-input w-full text-[10px]" accept="image/*">
+                       <p class="mt-1 text-[9px] text-green-700 font-bold truncate hidden file-status"></p>
                    </div>
                    <div class="border border-dashed border-blue-300 p-2 rounded bg-blue-50">
                        <label class="text-[10px] text-blue-600 block mb-1">Manómetros</label>
-                       <input type="file" class="cert-photo-pressure custom-file-input w-full" accept="image/*">
+                       <input type="file" class="cert-photo-pressure custom-file-input w-full text-[10px]" accept="image/*">
+                       <p class="mt-1 text-[9px] text-green-700 font-bold truncate hidden file-status"></p>
+                   </div>
+                   <div class="border border-dashed border-blue-300 p-2 rounded bg-blue-50">
+                       <label class="text-[10px] text-blue-600 block mb-1">T° Inyección</label>
+                       <input type="file" class="cert-photo-temp-in custom-file-input w-full text-[10px]" accept="image/*">
+                       <p class="mt-1 text-[9px] text-green-700 font-bold truncate hidden file-status"></p>
+                   </div>
+                   <div class="border border-dashed border-blue-300 p-2 rounded bg-blue-50">
+                       <label class="text-[10px] text-blue-600 block mb-1">T° Retorno</label>
+                       <input type="file" class="cert-photo-temp-out custom-file-input w-full text-[10px]" accept="image/*">
+                       <p class="mt-1 text-[9px] text-green-700 font-bold truncate hidden file-status"></p>
                    </div>
                </div>
             </div>
         `;
+        
+        // AGREGAR LISTENER PARA MOSTRAR NOMBRE DEL ARCHIVO
+        const inputs = div.querySelectorAll('input[type="file"]');
+        inputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const statusP = this.nextElementSibling;
+                if (this.files && this.files[0]) {
+                    statusP.textContent = '✅ ' + this.files[0].name;
+                    statusP.classList.remove('hidden');
+                } else {
+                    statusP.classList.add('hidden');
+                }
+            });
+        });
+
         equiposContainer.appendChild(div);
         updateRemoveButtons();
     }
@@ -490,18 +531,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
             for (const [idx, item] of items.entries()) {
                 const getVal = (sel) => item.querySelector(sel)?.value || '-';
+                
                 const vacFile = item.querySelector('.cert-photo-vacuum').files[0];
                 const pressFile = item.querySelector('.cert-photo-pressure').files[0];
+                const tempInFile = item.querySelector('.cert-photo-temp-in').files[0];
+                const tempOutFile = item.querySelector('.cert-photo-temp-out').files[0];
                 
-                let vacImg = '', pressImg = '';
-                if (vacFile) {
-                    try { const url = await readFileAsDataURL(vacFile); vacImg = `<div class="bg-gray-100 p-1 flex justify-center items-center h-24 border border-gray-200"><img src="${url}" class="max-h-full max-w-full object-contain" style="display:block;"></div>`; } catch(e){}
-                }
-                if (pressFile) {
-                    try { const url = await readFileAsDataURL(pressFile); pressImg = `<div class="bg-gray-100 p-1 flex justify-center items-center h-24 border border-gray-200"><img src="${url}" class="max-h-full max-w-full object-contain" style="display:block;"></div>`; } catch(e){}
-                }
+                let vacImg = '', pressImg = '', tempInImg = '', tempOutImg = '';
+                
+                const createImgHtml = async (file) => {
+                    if(!file) return '';
+                    try {
+                        const url = await readFileAsDataURL(file);
+                        return `<div class="print-photo-container rounded bg-gray-100"><img src="${url}" class="max-h-full max-w-full object-contain" style="display:block;"></div>`;
+                    } catch(e) { return ''; }
+                };
 
-                const photosHtml = (vacImg || pressImg) ? `<div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-gray-100">${vacImg}${pressImg}</div>` : '';
+                vacImg = await createImgHtml(vacFile);
+                pressImg = await createImgHtml(pressFile);
+                tempInImg = await createImgHtml(tempInFile);
+                tempOutImg = await createImgHtml(tempOutFile);
+
+                const photosHtml = (vacImg || pressImg || tempInImg || tempOutImg) ? 
+                    `<div class="grid grid-cols-4 gap-2 mt-2 pt-2 border-t border-gray-100">
+                        ${vacImg}${pressImg}${tempInImg}${tempOutImg}
+                     </div>` : '';
 
                 const row = document.createElement('div');
                 row.className = 'equipo-item-print bg-white rounded border border-gray-300 p-2 mb-2 text-[10px] break-inside-avoid';
@@ -512,11 +566,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div><strong>UE:</strong> ${getVal('.cert-ue-brand')} / ${getVal('.cert-ue-model')}</div>
                         <div><strong>S/N UI:</strong> ${getVal('.cert-ui-serial')}</div>
                         <div><strong>S/N UE:</strong> ${getVal('.cert-ue-serial')}</div>
-                        <div class="col-span-2 mt-1 pt-1 border-t border-gray-100 grid grid-cols-4 gap-1 text-center bg-gray-50 rounded">
-                            <span><strong>Vacío:</strong> ${getVal('.cert-vacuum')}mic</span>
-                            <span><strong>P.Baja:</strong> ${getVal('.cert-pressure-low')}</span>
-                            <span><strong>P.Alta:</strong> ${getVal('.cert-pressure-high')}</span>
+                        <div class="col-span-2 mt-1 pt-1 border-t border-gray-100 grid grid-cols-6 gap-1 text-center bg-gray-50 rounded font-mono">
                             <span><strong>Gas:</strong> ${getVal('.cert-refrigerant')}</span>
+                            <span><strong>Vac:</strong> ${getVal('.cert-vacuum')}</span>
+                            <span><strong>Baja:</strong> ${getVal('.cert-pressure-low')}</span>
+                            <span><strong>Alta:</strong> ${getVal('.cert-pressure-high')}</span>
+                            <span class="text-blue-700"><strong>T°In:</strong> ${getVal('.cert-temp-in')}</span>
+                            <span class="text-red-700"><strong>T°Out:</strong> ${getVal('.cert-temp-out')}</span>
                         </div>
                     </div>
                     ${photosHtml}
@@ -538,14 +594,11 @@ document.addEventListener('DOMContentLoaded', function() {
             document.title = `Certificado_${document.getElementById('cert-client-name').value.replace(/\s+/g,'_')}`;
 
             // --- ACTUALIZAR FOLIO SIGUIENTE (LÓGICA MEJORADA) ---
-            // Tomamos el valor que está escrito en el input (sea automático o manual)
             const parts = certNumberInput.value.split('.'); 
-            // Esperamos formato ALGO.NUMERO (ej: EC-CERT-2026.48)
             if (parts.length === 2) {
                 const currentSeq = parseInt(parts[1]);
                 const year = new Date().getFullYear();
                 if (!isNaN(currentSeq)) {
-                    // Guardamos NUMERO + 1 para la próxima
                     localStorage.setItem(`easycool_cert_seq_${year}`, currentSeq + 1);
                 }
             }
@@ -562,11 +615,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- INICIALIZACIÓN ---
     const currentYear = new Date().getFullYear();
-    // Leemos la secuencia guardada o empezamos en 48
     let sequence = localStorage.getItem(`easycool_cert_seq_${currentYear}`);
     if (!sequence) sequence = 48;
     
-    // Asignamos al input (ahora editable)
     certNumberInput.value = `EC-CERT-${currentYear}.${sequence}`;
     
     document.getElementById('cert-install-date').valueAsDate = new Date();
