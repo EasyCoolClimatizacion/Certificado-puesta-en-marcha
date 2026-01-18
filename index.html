@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Certificado de Instalación v7.2 - EasyCool</title>
+    <title>Certificado de Instalación v7.4 - EasyCool</title>
     
     <!-- CONFIGURACIÓN DE ICONO (APP NATIVA) -->
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1830/1830182.png">
@@ -61,7 +61,7 @@
                 <h2 class="text-2xl font-bold text-gray-900">Generar Certificado</h2>
                 <p class="text-xs text-green-600 font-bold mt-1" id="auto-save-status"><i class="fas fa-check-circle"></i> Sistema listo</p>
             </div>
-            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">v7.2 History</span>
+            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">v7.4 Stable</span>
         </div>
         
         <!-- Datos Cliente -->
@@ -270,10 +270,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // ==========================================
-    // 1. UTILIDADES Y COMPRESIÓN DE IMÁGENES
+    // 1. UTILIDADES Y COMPRESIÓN DE IMÁGENES (OPTIMIZADA)
     // ==========================================
     
-    async function compressImage(file, maxWidth = 800, quality = 0.7) {
+    async function compressImage(file, maxWidth = 500, quality = 0.5) { // Agresiva para estabilidad
         return new Promise((resolve) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==========================================
     // 2. CANVAS FIRMAS
     // ==========================================
-    const signatures = { client: null, tech: null }; // Guardar estado base64
+    const signatures = { client: null, tech: null }; 
 
     function initSignaturePad(canvasId, clearBtnId, type) {
         const canvas = document.getElementById(canvasId);
@@ -315,7 +315,6 @@ document.addEventListener('DOMContentLoaded', function() {
         function resizeCanvas() {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
             if(canvas.offsetWidth > 0) {
-                // Guardar contenido si existe
                 const oldContent = signatures[type]; 
                 canvas.width = canvas.offsetWidth * ratio;
                 canvas.height = canvas.offsetHeight * ratio;
@@ -354,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function stopDrawing() { 
             if(isDrawing) {
                 isDrawing = false; 
-                signatures[type] = canvas.toDataURL(); // Auto-guardar firma en RAM
+                signatures[type] = canvas.toDataURL(); 
             }
         }
         function clearCanvas() {
@@ -392,7 +391,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- MANEJO DE EQUIPOS ---
     let equipoCount = 0;
     
-    // Función helper para crear input de archivo con lógica de compresión
     function createFileBlock(label, className) {
         return `
             <div class="border border-dashed border-blue-300 p-2 rounded bg-blue-50 relative">
@@ -474,11 +472,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // RELLENAR IMÁGENES SI VIENEN DEL HISTORIAL
         if (data) {
-            // Select Gas
             const selGas = div.querySelector('.cert-refrigerant');
             if(data.gas) selGas.value = data.gas;
 
-            // Restore images from base64
             const restoreImg = (cls, b64) => {
                 if (b64) {
                     const parent = div.querySelector(`.${cls}`).parentElement;
@@ -532,7 +528,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 p_high: row.querySelector('.cert-pressure-high').value,
                 t_in: row.querySelector('.cert-temp-in').value,
                 t_out: row.querySelector('.cert-temp-out').value,
-                // IMÁGENES YA COMPRIMIDAS (BASE64)
                 img_vacuum: row.querySelector('.cert-photo-vacuum-base64').value,
                 img_pressure: row.querySelector('.cert-photo-pressure-base64').value,
                 img_temp_in: row.querySelector('.cert-photo-temp-in-base64').value,
@@ -557,7 +552,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function saveToHistory(data) {
         let history = JSON.parse(localStorage.getItem('easycool_history_v2') || '[]');
         history.unshift(data);
-        if (history.length > 10) history.pop(); // Guardar solo últimos 10 para no explotar localStorage
+        if (history.length > 10) history.pop(); // Guardar solo últimos 10
         localStorage.setItem('easycool_history_v2', JSON.stringify(history));
         renderHistory();
     }
@@ -634,7 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // ==========================================
-    // 5. GENERAR PDF
+    // 5. GENERAR PDF (ESTABILIDAD MEJORADA)
     // ==========================================
     generateCertificateBtn.addEventListener('click', async () => {
         btnText.style.display = 'none';
@@ -666,8 +661,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Firmas
             const sigClient = document.getElementById('print-signature-image-client');
             const sigTech = document.getElementById('print-signature-image-tech');
-            // Nota: Aquí se deberían capturar del canvas fresco o del historial si se guardaran las firmas también
-            // Por ahora usamos el canvas activo
             sigClient.src = clientPad.canvas.toDataURL();
             sigTech.src = techPad.canvas.toDataURL();
             sigClient.style.display = 'block';
@@ -677,12 +670,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const printContainer = document.getElementById('print-equipos-container');
             printContainer.innerHTML = '';
 
-            formData.equipos.forEach((eq, idx) => {
-                // Función para crear bloque de imagen
+            let allEquiposHtml = '';
+
+            for (const [idx, eq] of formData.equipos.entries()) {
+                // CALCULAR DELTA T
+                const tIn = parseFloat(eq.t_in);
+                const tOut = parseFloat(eq.t_out);
+                let deltaT = "N/A";
+                if(!isNaN(tIn) && !isNaN(tOut)){
+                    deltaT = Math.abs(tOut - tIn).toFixed(1) + "°C";
+                }
+
+                // Función para crear bloque de imagen (Simplificada y sin promesas dentro del loop)
                 const imgBlock = (b64, label) => b64 ? `
                     <div style="width: 23%; display: inline-block; vertical-align: top; margin: 0 1%;">
                         <div style="height: 90px; background-color: #f3f4f6; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
-                            <img src="${b64}" style="display: block; max-width: 100%; max-height: 100%; object-fit: contain;">
+                            <img src="${b64}" width="100%" style="display: block; max-width: 100%; max-height: 100%; object-fit: contain;">
                         </div>
                         <div style="font-size: 9px; text-align: center; color: #4b5563; margin-top: 2px; font-weight: 600;">${label}</div>
                     </div>` : '';
@@ -696,28 +699,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
 
-                const row = document.createElement('div');
-                row.className = 'equipo-item-print bg-white rounded border border-gray-300 p-2 mb-2 text-[10px] break-inside-avoid';
-                row.innerHTML = `
-                    <div class="font-bold text-blue-800 border-b border-gray-200 mb-1 pb-1">Equipo #${idx+1} - ${eq.location}</div>
-                    <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-                        <div><strong>UI:</strong> ${eq.ui_brand} / ${eq.ui_model}</div>
-                        <div><strong>UE:</strong> ${eq.ue_brand} / ${eq.ue_model}</div>
-                        <div><strong>S/N UI:</strong> ${eq.ui_serial}</div>
-                        <div><strong>S/N UE:</strong> ${eq.ue_serial}</div>
-                        <div class="col-span-2 mt-1 pt-1 border-t border-gray-100 grid grid-cols-6 gap-1 text-center bg-gray-50 rounded font-mono">
-                            <span><strong>Gas:</strong> ${eq.gas}</span>
-                            <span><strong>Vac:</strong> ${eq.vacuum}</span>
-                            <span><strong>Baja:</strong> ${eq.p_low}</span>
-                            <span><strong>Alta:</strong> ${eq.p_high}</span>
-                            <span class="text-blue-700"><strong>T°In:</strong> ${eq.t_in}</span>
-                            <span class="text-red-700"><strong>T°Out:</strong> ${eq.t_out}</span>
+                allEquiposHtml += `
+                    <div class="equipo-item-print bg-white rounded border border-gray-300 p-2 mb-2 text-[10px] break-inside-avoid">
+                        <div class="font-bold text-blue-800 border-b border-gray-200 mb-1 pb-1">Equipo #${idx+1} - ${eq.location}</div>
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                            <div><strong>UI:</strong> ${eq.ui_brand} / ${eq.ui_model}</div>
+                            <div><strong>UE:</strong> ${eq.ue_brand} / ${eq.ue_model}</div>
+                            <div><strong>S/N UI:</strong> ${eq.ui_serial}</div>
+                            <div><strong>S/N UE:</strong> ${eq.ue_serial}</div>
+                            <div class="col-span-2 mt-1 pt-1 border-t border-gray-100 grid grid-cols-7 gap-1 text-center bg-gray-50 rounded font-mono text-[9px]">
+                                <span><strong>Gas:</strong> ${eq.gas}</span>
+                                <span><strong>Vac:</strong> ${eq.vacuum}</span>
+                                <span><strong>Baja:</strong> ${eq.p_low}</span>
+                                <span><strong>Alta:</strong> ${eq.p_high}</span>
+                                <span class="text-blue-700"><strong>Iny:</strong> ${eq.t_in}°</span>
+                                <span class="text-red-700"><strong>Ret:</strong> ${eq.t_out}°</span>
+                                <span class="bg-blue-100 text-blue-800 rounded px-1"><strong>ΔT:</strong> ${deltaT}</span>
+                            </div>
                         </div>
+                        ${photosHtml}
                     </div>
-                    ${photosHtml}
                 `;
-                printContainer.appendChild(row);
-            });
+                
+                // Pequeña pausa para no bloquear la UI si hay muchos equipos
+                await new Promise(r => setTimeout(r, 10)); 
+            }
+            
+            printContainer.innerHTML = allEquiposHtml;
+
+            // Esperar renderizado de imágenes
+            await new Promise(r => setTimeout(r, 800));
 
             // Checklist Visual
             const checkContainer = document.getElementById('print-cert-checklist');
