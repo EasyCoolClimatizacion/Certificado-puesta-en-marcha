@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Certificado de Instalación v7.4 - EasyCool</title>
+    <title>Certificado de Instalación v7.5 - EasyCool</title>
     
     <!-- CONFIGURACIÓN DE ICONO (APP NATIVA) -->
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1830/1830182.png">
@@ -61,7 +62,7 @@
                 <h2 class="text-2xl font-bold text-gray-900">Generar Certificado</h2>
                 <p class="text-xs text-green-600 font-bold mt-1" id="auto-save-status"><i class="fas fa-check-circle"></i> Sistema listo</p>
             </div>
-            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">v7.4 Stable</span>
+            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">v7.5 DeltaT</span>
         </div>
         
         <!-- Datos Cliente -->
@@ -677,8 +678,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 const tIn = parseFloat(eq.t_in);
                 const tOut = parseFloat(eq.t_out);
                 let deltaT = "N/A";
+                let deltaTStyle = "bg-gray-100 text-gray-800"; // Color por defecto
+
                 if(!isNaN(tIn) && !isNaN(tOut)){
-                    deltaT = Math.abs(tOut - tIn).toFixed(1) + "°C";
+                    const diff = Math.abs(tOut - tIn);
+                    deltaT = diff.toFixed(1) + "°C";
+                    
+                    // Semáforo Delta T
+                    if (diff >= 8 && diff <= 14) {
+                        deltaTStyle = "bg-green-100 text-green-700"; // Rango OK
+                    } else {
+                        deltaTStyle = "bg-red-100 text-red-700"; // Fuera de rango
+                    }
                 }
 
                 // Función para crear bloque de imagen (Simplificada y sin promesas dentro del loop)
@@ -714,7 +725,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span><strong>Alta:</strong> ${eq.p_high}</span>
                                 <span class="text-blue-700"><strong>Iny:</strong> ${eq.t_in}°</span>
                                 <span class="text-red-700"><strong>Ret:</strong> ${eq.t_out}°</span>
-                                <span class="bg-blue-100 text-blue-800 rounded px-1"><strong>ΔT:</strong> ${deltaT}</span>
+                                <span class="${deltaTStyle} rounded px-1"><strong>ΔT:</strong> ${deltaT}</span>
                             </div>
                         </div>
                         ${photosHtml}
